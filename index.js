@@ -1,11 +1,18 @@
 const SHA256 = require("crypto-js/sha256");
 
+class Transaction {
+  constructor(timestamp, payerAddr, payeeAddr, amount) {
+    this.timestamp = timestamp;
+    this.payerAddr = payerAddr;
+    this.payeeAddr = payeeAddr;
+    this.amount = amount;
+  }
+}
 // to define a single block
 class Block {
-  constructor(index, timestamp, data, previousHash) {
-    this.index = index;
+  constructor(timestamp, txns, previousHash) {
     this.timestamp = timestamp;
-    this.data = data;
+    this.txns = txns;
     this.previousHash = previousHash;
     this.nonce = 0;
     this.hash = this.calculateHash();
@@ -16,7 +23,7 @@ class Block {
       this.index +
         this.previousHash +
         this.timestamp +
-        JSON.stringify(this.data) +
+        JSON.stringify(this.txns) +
         this.nonce
     ).toString();
   }
@@ -38,6 +45,8 @@ class Blockchain {
   constructor() {
     this.chain = [this.createGenesisBlock()];
     this.difficulty = 4;
+    this.unminedTxns = [];
+    this.minigReward = 50;
   }
 
   createGenesisBlock() {
@@ -48,10 +57,26 @@ class Blockchain {
     return this.chain[this.chain.length - 1];
   }
 
-  addBlock(newBlock) {
-    newBlock.previousHash = this.getLatestBlock().hash;
-    newBlock.mineBlock(this.difficulty);
-    this.chain.push(newBlock);
+  // addBlock(newBlock) {
+  //   newBlock.previousHash = this.getLatestBlock().hash;
+  //   newBlock.mineBlock(this.difficulty);
+  //   this.chain.push(newBlock);
+  // }
+
+  mineCurrentBlock(minerAddr) {
+    let block = new Block(
+      Date.now(),
+      this.unminedTxns,
+      this.getLatestBlock().hash
+    );
+    block.mineBlock(this.difficulty);
+    console.log("Current Block successfully mined...");
+
+    this.chain.push(block);
+
+    this.unminedTxns = [
+      new Transaction(Date.now(), "mint", minerAddr, this.minigReward),
+    ];
   }
 
   isChainValid() {
