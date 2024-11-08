@@ -43,14 +43,21 @@ class Block {
 
 class Blockchain {
   constructor() {
-    this.chain = [this.createGenesisBlock()];
-    this.difficulty = 4;
+    this.chain = [];
+    this.difficulty = 3;
     this.unminedTxns = [];
     this.minigReward = 50;
+    this.createGenesisBlock();
   }
 
   createGenesisBlock() {
-    return new Block(0, "09/08/2024", "Genesis Block", "0");
+    // manualy
+    // return new Block(0, "09/08/2024", "Genesis Block", "0");
+
+    // auto generate
+    let txn = new Transaction(Date.now(), "mint", "gemesis", 0);
+    let block = new Block(Date.now(), [txn], "0");
+    this.chain.push(block);
   }
 
   getLatestBlock() {
@@ -79,6 +86,25 @@ class Blockchain {
     ];
   }
 
+  createTransaction(txn) {
+    this.unminedTxns.push(txn);
+  }
+
+  getAddressBalance(addr) {
+    let balance = 0;
+    for (const block of this.chain) {
+      for (const txn of block.txns) {
+        if (txn.payerAddr === addr) {
+          balance -= txn.amount;
+        }
+        if (txn.payeeAddr === addr) {
+          balance += txn.amount;
+        }
+      }
+    }
+    return balance;
+  }
+
   isChainValid() {
     for (let i = 0; i < this.chain.length; i++) {
       const currentBlock = this.chain[i];
@@ -99,12 +125,52 @@ class Blockchain {
   }
 }
 
-let demoChain = new Blockchain();
+let demoCoin = new Blockchain();
 
-console.log("Starting to mine a new block...");
-demoChain.addBlock(new Block(1, "10/08/2024", { amount: 10 }));
+// 1st block
+demoCoin.createTransaction(
+  new Transaction(Date.now(), "wallet-ALice", "wallet-Bob", 50)
+);
+demoCoin.createTransaction(
+  new Transaction(Date.now(), "wallet-Bob", "wallet-ALice", 25)
+);
 
-console.log("Starting to mine a new block...");
-demoChain.addBlock(new Block(2, "11/08/2024", { amount: 25 }));
+console.log("\nMining a block:");
+demoCoin.mineCurrentBlock("wallet-Miner49r");
 
-console.log(JSON.stringify(demoChain, null, 4));
+console.log("\nBalance: Alice: ", +demoCoin.getAddressBalance("wallet-ALice"));
+console.log("\nBalance: Bob: ", +demoCoin.getAddressBalance("wallet-Bob"));
+console.log(
+  "\nBalance: Miner49r: ",
+  +demoCoin.getAddressBalance("wallet-Miner49r")
+);
+
+// 2nd block
+demoCoin.createTransaction(
+  new Transaction(Date.now(), "wallet-ALice", "wallet-Bob", 50)
+);
+demoCoin.createTransaction(
+  new Transaction(Date.now(), "wallet-Bob", "wallet-ALice", 25)
+);
+
+console.log("\nMining a block:");
+demoCoin.mineCurrentBlock("wallet-Miner49r");
+
+console.log("\nBalance: Alice: ", +demoCoin.getAddressBalance("wallet-ALice"));
+console.log("\nBalance: Bob: ", +demoCoin.getAddressBalance("wallet-Bob"));
+console.log(
+  "\nBalance: Miner49r: ",
+  +demoCoin.getAddressBalance("wallet-Miner49r")
+);
+
+// ************************
+
+// let demoChain = new Blockchain();
+
+// console.log("Starting to mine a new block...");
+// demoChain.addBlock(new Block(1, "10/08/2024", { amount: 10 }));
+
+// console.log("Starting to mine a new block...");
+// demoChain.addBlock(new Block(2, "11/08/2024", { amount: 25 }));
+
+// console.log(JSON.stringify(demoChain, null, 4));
