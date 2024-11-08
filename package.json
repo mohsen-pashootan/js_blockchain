@@ -4,7 +4,8 @@
   "description": "prototype for blockchain written in javascript",
   "main": "index.js",
   "dependencies": {
-    "crypto-js": "^4.0.0"
+    "crypto-js": "^4.2.0",
+    "express": "^4.18.2"
   },
   "devDependencies": {},
   "scripts": {
@@ -15,9 +16,5 @@
     "url": "git+https://github.com/mohsen-pashootan/js_blockchain.git"
   },
   "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/mohsen-pashootan/js_blockchain/issues"
-  },
-  "homepage": "https://github.com/mohsen-pashootan/js_blockchain#readme"
+  "license": "ISC"
 }
