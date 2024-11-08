@@ -47,7 +47,22 @@ class Blockchain {
     this.difficulty = 3;
     this.unminedTxns = [];
     this.minigReward = 50;
+    this.registeredAddresses = [
+      "wallet-Alice",
+      "wallet-Bob",
+      "wallet-Charlie",
+      "wallet-Miner49r",
+    ];
     this.createGenesisBlock();
+    this.airdropCoins(100);
+  }
+
+  airdropCoins(coins) {
+    for (const addr of this.registeredAddresses) {
+      let txn = new Transaction(Date.now(), "mint", addr, coins);
+      this.unminedTxns.push(txn);
+    }
+    this.mineCurrentBlock("wallet-Miner49r");
   }
 
   createGenesisBlock() {
