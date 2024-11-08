@@ -86,9 +86,17 @@ class Blockchain {
   // }
 
   mineCurrentBlock(minerAddr) {
+    let validateTxn = [];
+
+    for (const txn of this.unminedTxns) {
+      if (txn.payerAddr === "mint" || this.validateTransaction(txn)) {
+        validateTxn.push(txn);
+      }
+    }
+
     let block = new Block(
       Date.now(),
-      this.unminedTxns,
+      validateTxn, // old value =>this.unminedTxns,
       this.getLatestBlock().hash
     );
     block.mineBlock(this.difficulty);
@@ -99,6 +107,15 @@ class Blockchain {
     this.unminedTxns = [
       new Transaction(Date.now(), "mint", minerAddr, this.minigReward),
     ];
+  }
+
+  validateTransaction(txn) {
+    let payerAddr = txn.payerAddr;
+    let balance = this.getAddressBalance(payerAddr);
+    if (balance >= txn.amount) {
+      return true;
+    }
+    return false;
   }
 
   createTransaction(txn) {
